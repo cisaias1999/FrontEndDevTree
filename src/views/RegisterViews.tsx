@@ -6,6 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 import { isAxiosError } from 'axios';
 import * as yup from 'yup';
+import { toast } from 'sonner';
 const schema = yup.object().shape({
     name: yup.string().required('Este nombre es requerido'),
     email: yup.string().email('El email no es valido').required('Digita un email valido'),
@@ -23,7 +24,9 @@ export default function LoginViews() {
         password: '',
         password_confirmation: ''
     }
-    const { register, handleSubmit, formState: { errors } } = useForm({
+
+
+    const { register, handleSubmit,reset, formState: { errors } } = useForm({
         defaultValues: initialValues,
         resolver: yupResolver(schema)
     });
@@ -31,11 +34,13 @@ export default function LoginViews() {
     const handleRegister = async (data: RegisterForm) => {
         try {
             const response = await axios.post('http://localhost:4000/auth/register', data);
-            console.log(response)
+            reset();
+            console.log("dsdfsdfsdsdf "+response)
+            toast.success(response.data.message)
         } catch (error) {
             if (isAxiosError(error) && error.response) {
-                console.log(error.response?.data?.error)
-                }  
+                toast.error(error.response.data.message)
+            }
         }
         console.log(data)
     }
